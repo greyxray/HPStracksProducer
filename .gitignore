@@ -1,0 +1,10 @@
+*.root
+*.png
+*.pdf
+*~
+*.tar
+*.zip
+*.tar.gz
+*.gz
+*.pyc
+

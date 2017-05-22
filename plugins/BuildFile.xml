@@ -16,4 +16,11 @@
 <use nem="DataFormats/GenParticleFwd"/>
 <use nem="DataFormats/GenParticle"/>
 <use nem="PhysicsTools/MCTruthDeltaRMatcherNew"/>
+<use name="DataFormats/HPStracks"/>
 <flags EDM_PLUGIN="1"/>
+<!-- <class name="edm::AssociationMap< edm::OneToValue <reco::TrackCollection, reco::PFCandidatePtr > > "/> 
+TracksToHPSPionsMap
+-->
+
+  <!-- the dictionary for std::map<unsigned int, std::vector<unsigned int> > is not needed
+         because it is defined in DataFormats/Common library -->

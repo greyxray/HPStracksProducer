@@ -55,6 +55,8 @@ process.HPSTracksLable = cms.EDProducer('HPStracksProducer')##process.load("HPSt
 print("HPSTracksLable is now hpsTracks")
 process.load("HPStracks.HPStracksProducer.HPSTracks_cfi") # gives hpsTracks
 
+print("This is HPS Producer config file. And this is the source:")
+print(process.source)
 
 print("SecondaryVerticesFromNewV0")
 process.load("RecoVertex.V0Producer.generalV0Candidates_cfi")
@@ -85,6 +87,7 @@ available_v0 = {'new': {
 					"newv0": False}
 					}
 which_v0 = available_v0['new']
+
 print("output prep")
 process.out = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string('myOutputFileWITHv0Ks.root')
@@ -93,6 +96,5 @@ process.out = cms.OutputModule("PoolOutputModule",
 print("Run")
 #process.p = cms.Path( process.SecondaryVerticesFromNewV0 if filekey == "JetHTdataWithHPSTracks" else process.HPSTracksLable * process.SecondaryVerticesFromNewV0)
 process.p = cms.Path( process.hpsTracks * process.SecondaryVerticesFromNewV0)# OR: process.p = cms.Path( process.HPSTracksLable * process.SecondaryVerticesFromNewV0)
-
 
 process.e = cms.EndPath(process.out)

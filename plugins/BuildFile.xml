@@ -17,6 +17,7 @@
 <use nem="DataFormats/GenParticle"/>
 <use nem="PhysicsTools/MCTruthDeltaRMatcherNew"/>
 <use name="DataFormats/HPStracks"/>
+<!-- <use name="std::map< const reco::Track *, const reco::PFCandidate&>"> -->
 <flags EDM_PLUGIN="1"/>
 <!-- <class name="edm::AssociationMap< edm::OneToValue <reco::TrackCollection, reco::PFCandidatePtr > > "/> 
 TracksToHPSPionsMap

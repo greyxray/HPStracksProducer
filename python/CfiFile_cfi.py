@@ -1,4 +1,4 @@
 import FWCore.ParameterSet.Config as cms
 
-hpsTracks = cms.EDProducer('HPStracksProducer'
-)
+#include only the producer
+hpsTracks = cms.EDProducer('HPStracksProducer')

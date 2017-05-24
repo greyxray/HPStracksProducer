@@ -20,6 +20,7 @@
 // system include files
 #include <memory>
 #include <vector> 
+#include <map> 
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -114,6 +115,7 @@ class HPStracksProducer : public edm::stream::EDProducer<>
     typedef edm::AssociationMap< edm::OneToValue <reco::TrackCollection, int > > TracksToHPSPionsMap_local_int; 
       // replace by DataFormats TracksToHPSPionsMap 
     typedef edm::AssociationMap< edm::OneToValue <reco::TrackCollection, reco::PFCandidatePtr > > TracksToHPSPionsMap_local; 
+    //typedef std::map< const reco::Track *, const reco::PFCandidate&> TracksToHPSPionsMap_local_map;
 //
 // static data member definitions
 //
@@ -140,6 +142,7 @@ HPStracksProducer::HPStracksProducer(const edm::ParameterSet& iConfig)
   //WAS std::vector<reco::Track>  
     produces<reco::TrackCollection>("HPSTracks"); //vector<reco::Track>                   "generalTracks"             ""                "RECO"  
     //////produces<reco::TracksToHPSPionsMap>("reco::TracksToHPSPionsMap");
+    produces<reco::TracksToHPSPionsMap_local_map>("TracksToHPSPionsMaplocalmap");
 }
 
 
@@ -188,12 +191,12 @@ HPStracksProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //outputTaus->reserve(PF_hps_taus->size());
 
   std::auto_ptr<reco::TracksToHPSPionsMap> tracksToPionsMap(new reco::TracksToHPSPionsMap());
-  std::cout<<"try to ini"<<std::endl;
+  
   std::auto_ptr<TracksToHPSPionsMap_local> tracksToPionsMap_local(new TracksToHPSPionsMap_local());
-  std::cout<<"ini:"<< tracksToPionsMap_local.get() <<std::endl;
+  
   std::auto_ptr<TracksToHPSPionsMap_local_int> tracksToPionsMap_local_int(new TracksToHPSPionsMap_local_int());
-
-
+  std::auto_ptr<reco::TracksToHPSPionsMap_local_map> tracksToHPSPionsMap_local_map(new reco::TracksToHPSPionsMap_local_map());
+  
 
   int tau_index = 0;
   for(reco::PFTauCollection::const_iterator inputTau = PF_hps_taus->begin(); inputTau != PF_hps_taus->end(); ++inputTau, tau_index++)
@@ -205,9 +208,9 @@ HPStracksProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //vector < reco::PFCandidatePtr  > 
       std::vector < reco::PFCandidatePtr  >  tau_signalPFChargedHadrCands    = pftauref->signalPFChargedHadrCands();//typedef edm::Ptr<PFCandidate> reco::PFCandidatePtr
       std::vector < reco::PFCandidatePtr  >  tau_isolationPFChargedHadrCands = pftauref->isolationPFChargedHadrCands(); // //typedef edm::Ptr<PFCandidate> reco::PFCandidatePtr
-    // All pi+-'s 
-    std::vector < reco::PFCandidatePtr > tau_picharge = pftauref->signalPFChargedHadrCands(); 
-                                          tau_picharge.insert(tau_picharge.end(), tau_isolationPFChargedHadrCands.begin(), tau_isolationPFChargedHadrCands.end());
+      // All pi+-'s 
+      std::vector < reco::PFCandidatePtr > tau_picharge = pftauref->signalPFChargedHadrCands(); 
+                                            tau_picharge.insert(tau_picharge.end(), tau_isolationPFChargedHadrCands.begin(), tau_isolationPFChargedHadrCands.end());
 
     for(unsigned pi_i = 0 ; pi_i < tau_picharge.size() ; pi_i++) 
     {
@@ -226,10 +229,14 @@ HPStracksProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
           outputTaus->push_back(*track);
           // tracksToPionsMap_local_int->insert( tau_picharge[pi_i]->trackRef(), int(1));
           // tracksToPionsMap->insert( tau_picharge[pi_i]->trackRef(),  (tau_picharge[pi_i]) );
+          
+          // std::cout<<"try to push: pi_i"<< pi_i<< " " << &track_pion << " " << (tau_picharge[pi_i]);// << std::endl;
+           //can't insert  tracksToPionsMap_local->insert( tau_picharge[pi_i]->trackRef(),  (tau_picharge[pi_i]) );
+          
+          // tracksToHPSPionsMap_local_map->insert({(const reco::Track *)track,  *(tau_picharge[pi_i])}); //https://stackoverflow.com/questions/4046265/stdmap-with-typedef-type-in-it
+          
+          tracksToHPSPionsMap_local_map->insert({(const reco::Track *)track,  tau_picharge[pi_i]}); //https://stackoverflow.com/questions/4046265/stdmap-with-typedef-type-in-it
 
-          std::cout<<"try to push: pi_i"<< pi_i<< " " << &track_pion << " " << (tau_picharge[pi_i]);// << std::endl;
-           //can't insert 
-          tracksToPionsMap_local->insert( tau_picharge[pi_i]->trackRef(),  (tau_picharge[pi_i]) );
           //edm::Ref< reco::TrackCollection >( (tau_picharge[pi_i]->trackRef()).get()),
           //edm::Ref< reco::PFCandidateCollection >( tau_picharge[pi_i] ) 
 
@@ -268,6 +275,7 @@ HPStracksProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //    std::cout<< (*itv).dxy() << "+-" << (*itv).dxyError() << std::endl;;
   // }
   iEvent.put(outputTaus, "HPSTracks");
+  iEvent.put(tracksToHPSPionsMap_local_map, "TracksToHPSPionsMaplocalmap");
   //////iEvent.put(tracksToPionsMap, "TracksToHPSPionsMap");
   //std::cout << "End" << std::endl;
  
